@@ -1,7 +1,9 @@
 package com.namjackson.firebaseapp
 
-import androidx.appcompat.app.AppCompatActivity
+import android.content.Context
+import android.content.Intent
 import android.os.Bundle
+import androidx.appcompat.app.AppCompatActivity
 
 class MainActivity : AppCompatActivity() {
 
@@ -9,4 +11,13 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
     }
+
+    companion object {
+        fun startActivity(context: Context?) {
+            context?.startActivity(
+                Intent(context, MainActivity::class.java)
+            )
+        }
+    }
+
 }
