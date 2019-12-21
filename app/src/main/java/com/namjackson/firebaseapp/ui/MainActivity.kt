@@ -1,9 +1,10 @@
-package com.namjackson.firebaseapp
+package com.namjackson.firebaseapp.ui
 
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import com.namjackson.firebaseapp.R
 
 class MainActivity : AppCompatActivity() {
 

@@ -1,4 +1,4 @@
-package com.namjackson.firebaseapp
+package com.namjackson.firebaseapp.ui
 
 import android.app.Activity
 import android.content.Intent
@@ -6,27 +6,42 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import com.firebase.ui.auth.AuthUI
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.FirebaseUser
+import com.namjackson.firebaseapp.R
 
 
 class SplashActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_splash)
+        checkFirebaseAuth()
+    }
 
-        FirebaseAuth.getInstance().signOut()
-        val currentUser: FirebaseUser? = FirebaseAuth.getInstance().currentUser
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        when (requestCode) {
+            REQ_CODE_FIREBASE_SIGN_IN -> {
+                when (resultCode) {
+                    Activity.RESULT_OK -> {
+                        startMain()
+                    }
+                    Activity.RESULT_CANCELED -> {
+                        finish()
+                    }
+                }
+            }
+        }
+    }
 
-        currentUser?.delete()
+    private fun checkFirebaseAuth() {
+        val currentUser = FirebaseAuth.getInstance().currentUser
         if (currentUser == null) {
-            startFireBaseSingin()
+            startFirebaseSignIn()
         } else {
             startMain()
         }
     }
 
-    fun startFireBaseSingin() {
+    private fun startFirebaseSignIn() {
 
         val providers = listOf(
             AuthUI.IdpConfig.EmailBuilder().build(),
@@ -37,7 +52,7 @@ class SplashActivity : AppCompatActivity() {
         startActivityForResult(
             AuthUI.getInstance()
                 .createSignInIntentBuilder()
-                .setTheme(R.style.AppTheme)
+                .setTheme(R.style.BackgroundTheme)
                 .setLogo(R.mipmap.ic_launcher)
                 .setAvailableProviders(providers)
                 .build(),
@@ -45,22 +60,9 @@ class SplashActivity : AppCompatActivity() {
         )
     }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-
-        when (requestCode) {
-            REQ_CODE_FIREBASE_SIGN_IN -> {
-                when (resultCode) {
-                    Activity.RESULT_OK -> {
-                        startMain()
-                    }
-                }
-            }
-        }
-    }
-
-    fun startMain() {
+    private fun startMain() {
         MainActivity.startActivity(this)
+        finish()
     }
 
     companion object {

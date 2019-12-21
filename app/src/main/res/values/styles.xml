@@ -8,4 +8,9 @@
         <item name="colorAccent">@color/colorAccent</item>
     </style>
 
+
+    <style name="BackgroundTheme" parent="AppTheme">
+        <item name="android:windowBackground">@drawable/bg_image</item>
+    </style>
+
 </resources>
