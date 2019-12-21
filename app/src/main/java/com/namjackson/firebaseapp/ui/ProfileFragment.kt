@@ -3,10 +3,11 @@ package com.namjackson.firebaseapp.ui
 import android.net.Uri
 import android.os.Bundle
 import android.view.View
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProviders
 import com.bumptech.glide.Glide
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.UserProfileChangeRequest
 import com.google.firebase.storage.FirebaseStorage
 import com.namjackson.firebaseapp.R
 import gun0912.tedimagepicker.builder.TedImagePicker
@@ -43,12 +44,43 @@ class ProfileFragment : Fragment(R.layout.fragment_profile) {
     private fun initListener() {
         profile_img.setOnClickListener {
             TedImagePicker.with(context!!)
-                .start { uri -> showProfileImage(uri) }
+                .start { uri -> uploadProfileImg(uri) }
         }
     }
 
-    private fun uploadProfileImg() {
+    private fun uploadProfileImg(uri: Uri) {
+        showLoading()
+        storageReference.putFile(uri)
+            .continueWithTask {
+                if (!it.isSuccessful) {
+                    it.exception?.let {
+                        throw it
+                    }
+                }
+                storageReference.downloadUrl
+            }
+            .addOnCompleteListener { it ->
+                hideLoading()
+                if (it.isSuccessful) {
+                    val result = it.result ?: return@addOnCompleteListener
+                    updateFirebaseImgUpdate(result)
+                }
+            }
 
+
+    }
+
+    private fun updateFirebaseImgUpdate(uri: Uri) {
+        val profileUpdates = UserProfileChangeRequest.Builder()
+            .setPhotoUri(uri)
+            .build()
+
+        firebaseUser.updateProfile(profileUpdates)
+            .addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    showProfileImage(uri)
+                }
+            }
     }
 
     private fun showProfileName(name: String) {
@@ -61,6 +93,15 @@ class ProfileFragment : Fragment(R.layout.fragment_profile) {
             .circleCrop()
             .into(profile_img)
     }
+
+    private fun hideLoading() {
+        loading.isVisible = false
+    }
+
+    private fun showLoading() {
+        loading.isVisible = true
+    }
+
 
     companion object {
         fun newInstance() = ProfileFragment()
